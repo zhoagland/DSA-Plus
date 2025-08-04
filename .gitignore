@@ -3,9 +3,7 @@ cvidistkit.*
 *.cds
 *.cws
 *.exe
-.vscode*
 *.cws
-.vscode
 
 # Prerequisites
 *.d
@@ -36,7 +34,7 @@ cvidistkit.*
 *.out
 *.app
 
- 
+
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
@@ -48,9 +46,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
+.cache/*
+build/
 
 [Oo][Uu][Tt]/
 [Bb][Uu][Ii][Ll][Dd]/
-.vscode/settings.json
-.vs/
-.clangd

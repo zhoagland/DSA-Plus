@@ -1,4 +1,4 @@
-cd .\build
+cd ./build
 
 #Generate make file
 cmake ..
@@ -10,7 +10,7 @@ make
 make documentation
 
 #Run the test code. In subfolder to prevent bundling with application
-ctest --test-dir .\test
+ctest --test-dir ./test
 
 #Compile into an installer
 cpack
