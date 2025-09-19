@@ -1,15 +1,15 @@
 /**
- * @file linked_list.h
+ * @file macros.h
  * @author Zachary Hoagland (zach@zacharyhoagland.com)
- * @brief API for the linked list data structure library.
+ * @brief Header file for common macros used in the library
  * @version 1.0
  * @date 2025-04-03
  *
  * @copyright Copyright Zachary Hoagland (c) 2025
  *
  */
-#ifndef _DSA_LINKED_LIST_H_
-#define _DSA_LINKED_LIST_H_
+#ifndef _DSA_MACROS_H_
+#define _DSA_MACROS_H_
 
 
 #ifdef __cplusplus
@@ -18,18 +18,13 @@
 
 
 /* -------------------- Public Includes --------------------------------- */
-#include "./macros.h"
-#include <stdbool.h>
+
 
 /* -------------------- Public Macros/Defines --------------------------- */
-DECLARE_HANDLE(LinkedListHandle);
+#define DECLARE_HANDLE(name)    struct name##__{int unused;}; typedef struct name##__ *name
 
 /* -------------------- Public Enums ------------------------------------ */
-typedef enum dsa_list_type {
-    SINGLY_LINKED_LIST,
-    DOUBLY_LINKED_LIST,
-    CIRCULARLY_LINKED_LIST,
-} dsa_list_type_t;
+
 
 /* -------------------- Public Structs ---------------------------------- */
 
@@ -47,4 +42,4 @@ typedef enum dsa_list_type {
 #endif
 
 
-#endif /* _DSA_LINKED_LIST_H_ */
+#endif /* _DSA_MACROS_H_ */
