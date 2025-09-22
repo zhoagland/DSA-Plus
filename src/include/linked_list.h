@@ -19,6 +19,7 @@
 
 /* -------------------- Public Includes --------------------------------- */
 #include "./macros.h"
+#include <stdint.h>
 #include <stdbool.h>
 
 /* -------------------- Public Macros/Defines --------------------------- */
@@ -39,8 +40,44 @@ typedef enum dsa_list_type {
 
 /* -------------------- Public Function Declarations -------------------- */
 
+/* Init / Destroy Functions */
+LinkedListHandle linked_list_initialize(dsa_list_type_t list_type, void *data);
+int linked_list_delete(LinkedListHandle *handle);
+int linked_list_mapped_action_on_delete(LinkedListHandle *handle, void(*mapping_fnc)(void *data));
 
+/* Insert Functions */
+int linked_list_insert_front(LinkedListHandle handle, void *data);
+int linked_list_insert_back(LinkedListHandle handle, void *data);
+int linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data);
+int linked_list_insert_sorted(LinkedListHandle handle, void *data, int(*cmpfunc)(void* a,void* b));
 
+/* Remove Functions */
+int linked_list_remove_front(LinkedListHandle handle);
+int linked_list_remove_back(LinkedListHandle handle);
+int linked_list_remove_node(LinkedListHandle handle);
+int linked_list_remove_at(LinkedListHandle handle);
+
+/* Retrieval Functions*/
+void *linked_list_get_back(LinkedListHandle handle);
+void *linked_list_get_at(LinkedListHandle handle, uint32_t location);
+void *get_front(LinkedListHandle handle);
+uint32_t linked_list_search(LinkedListHandle handle, void *data);
+bool linked_list_is_empty(LinkedListHandle handle);
+int linked_list_get_list_size(LinkedListHandle handle);
+
+/* Iterators */
+void *linked_list_iter_previous(LinkedListHandle handle, void *last_data_ptr);
+void *linked_list_iter_next(LinkedListHandle handle, void *last_data_ptr);
+
+/* Utility Functions */
+int linked_list_map_data(LinkedListHandle handle, void(*mapping_fnc)(void* data));
+void linked_list_print(LinkedListHandle handle, void(*data_printer)(void *));
+
+/* Error Functions */
+#ifdef _DSA_ERROR_H_
+int linked_list_get_error_code(LinkedListHandle handle);
+char *linked_list_get_error_message(LinkedListHandle handle);
+#endif /* _DSA_ERROR_H_ */
 
 #ifdef __cplusplus
     }

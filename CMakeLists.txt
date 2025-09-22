@@ -2,9 +2,9 @@
 cmake_minimum_required(VERSION 3.28)
 
 #set project name
-project(Template_Project
+project(DSA_Plus
         VERSION 1.0
-        DESCRIPTION "Template Project Description"
+        DESCRIPTION "Data Structure and Algorithms Library for C, Plus More."
         LANGUAGES C
 )
 
@@ -14,12 +14,13 @@ set(CMAKE_C_STANDARD_REQUIRED   ON)
 set(CMAKE_C_EXTENSIONS          OFF)
 
 
-add_executable(${PROJECT_NAME} ./src/main.c)
+#add_library(${PROJECT_NAME} STATIC "./src/data structures/linear/linked_list.c")
+add_subdirectory(src)
 
 configure_file(config.h.in config.h)
 
-target_include_directories(${PROJECT_NAME} PUBLIC "${PROJECT_BINARY_DIR}" )
-install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT out_component)
+#target_include_directories(${PROJECT_NAME} PUBLIC "${PROJECT_BINARY_DIR}" )
+#install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT out_component)
 install(FILES "${PROJECT_BINARY_DIR}/config.h" DESTINATION include )
 
 # --- Start of FetchContent configuration ---
@@ -29,7 +30,7 @@ include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        52eb8108c5bdec04579160ae17225d66034bd723 # Use a specific hash for reproducibility Release 1.17.0
+  GIT_TAG        v1.17.0
 )
 
 # Make the content available. This downloads and adds it to the build.
@@ -47,12 +48,4 @@ FetchContent_MakeAvailable(doxygen-awesome-css)
 add_subdirectory(docs)
 
 #CTest Settings
-add_subdirectory(test)
-
-#CPack Settings to make an installer
-include(InstallRequiredSystemLibraries)
-set(CPACK_COMPONENTS_ALL out_component)
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
-set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "$(PROJECT_VERSION_MINOR)")
-include(CPack)
+add_subdirectory(Unit_Tests)
