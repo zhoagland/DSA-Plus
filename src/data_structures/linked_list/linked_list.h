@@ -18,7 +18,7 @@
 
 
 /* -------------------- Public Includes --------------------------------- */
-#include "./macros.h"
+#include "macros.h"
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -52,16 +52,16 @@ int linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data
 int linked_list_insert_sorted(LinkedListHandle handle, void *data, int(*cmpfunc)(void* a,void* b));
 
 /* Remove Functions */
-int linked_list_remove_front(LinkedListHandle handle);
-int linked_list_remove_back(LinkedListHandle handle);
-int linked_list_remove_node(LinkedListHandle handle);
-int linked_list_remove_at(LinkedListHandle handle);
+int linked_list_remove_front(LinkedListHandle handle, void (*fnc_on_removal)(void *data));
+int linked_list_remove_back(LinkedListHandle handle, void (*fnc_on_removal)(void *data));
+int linked_list_remove_node(LinkedListHandle handle, void *data, void (*fnc_on_removal)(void *data));
+int linked_list_remove_at(LinkedListHandle handle, uint32_t location, void(*fnc_on_removal)(void *data));
 
 /* Retrieval Functions*/
 void *linked_list_get_back(LinkedListHandle handle);
 void *linked_list_get_at(LinkedListHandle handle, uint32_t location);
 void *get_front(LinkedListHandle handle);
-uint32_t linked_list_search(LinkedListHandle handle, void *data);
+int32_t linked_list_search(LinkedListHandle handle, void *data);
 bool linked_list_is_empty(LinkedListHandle handle);
 int linked_list_get_list_size(LinkedListHandle handle);
 

@@ -14,13 +14,12 @@ set(CMAKE_C_STANDARD_REQUIRED   ON)
 set(CMAKE_C_EXTENSIONS          OFF)
 
 
-#add_library(${PROJECT_NAME} STATIC "./src/data structures/linear/linked_list.c")
+
 add_subdirectory(src)
 
 configure_file(config.h.in config.h)
 
-#target_include_directories(${PROJECT_NAME} PUBLIC "${PROJECT_BINARY_DIR}" )
-#install(TARGETS ${PROJECT_NAME} DESTINATION bin COMPONENT out_component)
+
 install(FILES "${PROJECT_BINARY_DIR}/config.h" DESTINATION include )
 
 # --- Start of FetchContent configuration ---
@@ -32,9 +31,10 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/google/googletest.git
   GIT_TAG        v1.17.0
 )
-
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 # Make the content available. This downloads and adds it to the build.
 FetchContent_MakeAvailable(googletest)
+enable_testing()
 
 FetchContent_Declare(
   doxygen-awesome-css

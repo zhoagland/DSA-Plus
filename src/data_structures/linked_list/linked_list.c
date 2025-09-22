@@ -9,51 +9,17 @@
 *
 */
 /* -------------------- Private Includes ------------------------------------------- */
-#include "../../include/linked_list.h"
+#include "linked_list.h"
+#include "linked_list_internal.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifdef __DSA_ERROR_HANDLING
-#include "../../utility/error.h"
-#endif /* __DSA_ERROR_HANDLING */
-/* -------------------- Private Macros/Defines ------------------------------------- */
-#define VALIDATE_HANDLE(HANDLE)                                                                    \
-    do {                                                                                           \
-        if (HANDLE == NULL) return -1;                                                             \
-    } while (0)
 
+/* -------------------- Private Macros/Defines ------------------------------------- */
 /* -------------------- Private Enums ---------------------------------------------- */
 
-#ifdef __DSA_ERROR_HANDLING
-typedef enum _dsa_ll_error_codes {
-    LL_ERROR_NONE = 0
-} dsa_ll_error_codes_t;
-#endif /* __DSA_ERROR_HANDLING */
 /* -------------------- Private Structs -------------------------------------------- */
-
-#ifdef __DSA_ERROR_HANDLING
-typedef struct _dsa_ll_error {
-    dsa_error_t glob_error;
-    dsa_ll_error_codes_t error_code;
-} dsa_ll_error_t;
-#endif /* __DSA_ERROR_HANDLING */
-typedef struct _dsa_node {
-    void *data;
-    struct _dsa_node *next_node;
-    struct _dsa_node *previous_node;
-} dsa_node_t;
-
-typedef struct _dsa_linked_list_internal {
-    struct LinkedListHandle__ handle;
-    dsa_node_t *head;
-    dsa_node_t *tail;
-    dsa_list_type_t list_type;
-    uint32_t list_length;
-    #ifdef __DSA_ERROR_HANDLING
-    dsa_ll_error_t error;
-    #endif /* __DSA_ERROR_HANDLING */
-} dsa_linked_list_control_block_t;
 
 /* -------------------- Private (static) Vars -------------------------------------- */
 
@@ -121,14 +87,14 @@ LinkedListHandle linked_list_initialize(dsa_list_type_t list_type, void *data) {
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)calloc(1, sizeof(dsa_linked_list_control_block_t));
 
     if (!list) {
-        return -1;
+        return NULL;
     }
 
     list->list_type = list_type;
     list->list_length = 0;
     list->head = NULL;
     list->tail = NULL;
-    
+
     if (data) {
         linked_list_insert_front((LinkedListHandle)list, data);
     }
@@ -137,7 +103,7 @@ LinkedListHandle linked_list_initialize(dsa_list_type_t list_type, void *data) {
 }
 
 int linked_list_delete(LinkedListHandle *handle) {
-    VALIDATE_HANDLE(*handle);
+    VALIDATE_HANDLE(*handle, -1);
 
     dsa_node_t *next_node = NULL;
 
@@ -145,6 +111,12 @@ int linked_list_delete(LinkedListHandle *handle) {
     for (dsa_node_t *current_node = (*((dsa_linked_list_control_block_t **)handle))->head; current_node != NULL;) {
         // Store the next node into memory;
         next_node = current_node->next_node;
+        
+        // Check to see if node points to itself
+        if (next_node == current_node) {
+            next_node = NULL;
+        }
+
         // Free the current node.
         free(current_node);
         // Set the next node as the current node
@@ -154,12 +126,12 @@ int linked_list_delete(LinkedListHandle *handle) {
     // Free the control block
     free(*(dsa_linked_list_control_block_t**)handle);
     *handle = NULL;
-    
+
     return 0;
 }
 
 int linked_list_mapped_action_on_delete(LinkedListHandle *handle, void(*mapping_fnc)(void *data)) {
-    VALIDATE_HANDLE(*handle);
+    VALIDATE_HANDLE(*handle, -1);
 
     linked_list_map_data(*handle, mapping_fnc);
     linked_list_delete(handle);
@@ -167,7 +139,7 @@ int linked_list_mapped_action_on_delete(LinkedListHandle *handle, void(*mapping_
 }
 
 int linked_list_insert_front(LinkedListHandle handle, void *data) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
 
@@ -188,21 +160,41 @@ int linked_list_insert_front(LinkedListHandle handle, void *data) {
         case SINGLY_LINKED_LIST:
             list->head->next_node = previous_head;
             list->head->previous_node    = NULL;
-            
+
             if (previous_head) {
                 previous_head->previous_node = NULL;
-                
             }
+
             break;
+
         case DOUBLY_LINKED_LIST:
             list->head->previous_node = NULL;
+
+            if (previous_head) {
+                previous_head->previous_node = list->head;
+            }
+
             list->head->next_node = previous_head;
-            previous_head->previous_node = list->head;
+
             break;
+
         case CIRCULARLY_LINKED_LIST:
-            list->head->next_node = previous_head;
-            previous_head->previous_node = list->head;
+            
+
+            if (previous_head) {
+                list->head->next_node = previous_head;
+                previous_head->previous_node = list->head;
+            } else if(list->list_length == 0 ){
+                list->head->next_node = list->head;     
+            } else {
+                list->head->next_node = NULL;               
+            }
+
             list->head->previous_node = list->tail;
+
+            break;
+
+        default:
             break;
     }
 
@@ -212,7 +204,7 @@ int linked_list_insert_front(LinkedListHandle handle, void *data) {
 }
 
 int linked_list_insert_back(LinkedListHandle handle, void *data) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
     dsa_node_t *previous_tail = list->tail;
@@ -224,7 +216,7 @@ int linked_list_insert_back(LinkedListHandle handle, void *data) {
     list->tail = (dsa_node_t*)calloc(1, sizeof(dsa_node_t));
 
     if (!list->tail) {
-        return -1;    
+        return -1;
     }
 
     list->tail->data = data;
@@ -253,7 +245,7 @@ int linked_list_insert_back(LinkedListHandle handle, void *data) {
 }
 
 int linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
 
@@ -273,14 +265,14 @@ int linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data
     }
 
     current_node->next_node = (dsa_node_t*)calloc(1, sizeof(dsa_node_t));
-    
+
     if (!current_node->next_node) {
         return -1;
     }
 
     switch (list->list_type) {
         case SINGLY_LINKED_LIST:
-            
+
             current_node->next_node->data = data;
             current_node->next_node->next_node=next_node;
             break;
@@ -300,7 +292,7 @@ int linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data
 }
 
 int linked_list_insert_sorted(LinkedListHandle handle, void *data, int(*cmpfunc)(void* a,void* b)) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
     uint32_t loop_iter = 0;
@@ -333,74 +325,148 @@ int linked_list_insert_sorted(LinkedListHandle handle, void *data, int(*cmpfunc)
     return 0;
 }
 
-int linked_list_remove_front(LinkedListHandle handle) {
-    VALIDATE_HANDLE(handle);
+int linked_list_remove_front(LinkedListHandle handle, void (*fnc_on_removal)(void *data)) {
+    VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_node_t                      *old_head = list->head;
+
     // Check to see if there are nodes to remove
     if(list->list_length == 0) {
         return -1;
     }
 
-    // TODO
+    // Update the head to be the next node in the list
+    list->head = old_head->next_node;
+
+    // If not singly linked the head needs to point to the previous of the old head.
+    if (list->list_type != SINGLY_LINKED_LIST) {
+        list->head->previous_node = old_head->previous_node;
+    } else {
+        list->head->previous_node = NULL;
+    }
+
+    if (fnc_on_removal) {
+        (*fnc_on_removal)(old_head->data);
+    }
+
+    free(old_head);
+    old_head = NULL;
+
     // Decrement the node length counter
     list->list_length--;
-    return -1;
+    return 0;
 }
 
-int linked_list_remove_back(LinkedListHandle handle) {
-    VALIDATE_HANDLE(handle);
+int linked_list_remove_back(LinkedListHandle handle, void (*fnc_on_removal)(void *data)) {
+    VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_node_t                      *old_tail = list->tail;
+
     // Check to see if there are nodes to remove
-    if(list->list_length == 0) {
+    if (list->list_length == 0) {
         return -1;
     }
 
-    // TODO
+    // If not singly linked the head needs to point to the previous of the old head.
+    if (list->list_type != SINGLY_LINKED_LIST) {
+        // Update the head to be the next node in the list
+        list->tail = old_tail->previous_node;
+        list->tail->next_node = old_tail->next_node;
+    } else {
+        for (dsa_node_t *current_node = list->head; current_node;
+             current_node             = current_node->next_node) {
+
+            // If not tail
+            if (current_node->next_node) {
+                // If the nodes next node is the tail
+                if (current_node->next_node->next_node == NULL) {
+                    // The current node becomes new tail because old tail is being removed.
+                    list->tail = current_node;
+                    // Singly linked list so it points to NULL.
+                    list->tail->next_node = NULL;
+                }
+            }
+        }
+    }
+
+    if (fnc_on_removal) {
+        (*fnc_on_removal)(old_tail->data);
+    }
+
+    free(old_tail);
+    old_tail = NULL;
+
     // Decrement the node length counter
     list->list_length--;
-    return -1;
+    return 0;
 }
 
-int linked_list_remove_node(LinkedListHandle handle) {
-    VALIDATE_HANDLE(handle);
-
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
-    // Check to see if there are nodes to remove
-    if(list->list_length == 0) {
-        return -1;
-    }
-
-    // TODO
-    // Decrement the node length counter
-    list->list_length--;
-    return -1;
+int linked_list_remove_node(LinkedListHandle handle, void *data, void (*fnc_on_removal)(void *data)) {
+    return linked_list_remove_at(handle, linked_list_search(handle, data), fnc_on_removal);
 }
 
-int linked_list_remove_at(LinkedListHandle handle) {
-    VALIDATE_HANDLE(handle);
+int linked_list_remove_at(LinkedListHandle handle, uint32_t location, void(*fnc_on_removal)(void*data)) {
+    VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_node_t                      *previous_node = NULL;
+    dsa_node_t                      *current_node  = list->head;
+    dsa_node_t                      *next_node     = NULL;
+
+    // If node is loc 0 remove front
+    if (location == 0) {
+        return linked_list_remove_front(handle, fnc_on_removal);
+    }
+
+    // If node is end remove back
+    if (location == list->list_length) {
+        return linked_list_remove_back(handle, fnc_on_removal);
+    }
+
+    // Check to verify location is valid.
+    if (location < 0 || location > list->list_length) {
+        return -1;
+    }
+
     // Check to see if there are nodes to remove
     if(list->list_length == 0) {
         return -1;
     }
 
-    // TODO
+    for (size_t loc = 0; loc < location; location++) {
+        previous_node = current_node;
+        current_node = current_node->next_node;
+        next_node     = current_node->next_node;
+    }
+
+    previous_node->next_node = next_node;
+
+    if (list->list_type != SINGLY_LINKED_LIST) {
+        next_node->previous_node = previous_node;
+    }
+
+    if (fnc_on_removal){
+        (*fnc_on_removal)(current_node->data);
+    }
+
+    free(current_node);
+    current_node = NULL;
+
     // Decrement the node length counter
     list->list_length--;
-    return -1;
+    return 0;
 }
 
 void *linked_list_get_back(LinkedListHandle handle) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, NULL);
 
     return ((dsa_linked_list_control_block_t*)handle)->tail->data;
 }
 
 void *linked_list_get_at(LinkedListHandle handle, uint32_t location) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, NULL);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
     dsa_node_t                      *node = list->head;
@@ -423,18 +489,18 @@ void *linked_list_get_at(LinkedListHandle handle, uint32_t location) {
     for (uint32_t node_number = 0; node_number != location; node_number++) {
         node = node->next_node;
     }
-    
+
     return node->data;
 }
 
 void *get_front(LinkedListHandle handle) {
-    VALIDATE_HANDLE(handle);
-    
+    VALIDATE_HANDLE(handle, NULL);
+
     return ((dsa_linked_list_control_block_t*)handle)->head->data;
 }
 
 int linked_list_map_data(LinkedListHandle handle, void(*mapping_fnc)(void* data)) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, -1);
 
     dsa_node_t *node = NULL;
 
@@ -448,28 +514,35 @@ int linked_list_map_data(LinkedListHandle handle, void(*mapping_fnc)(void* data)
     return 0;
 }
 
-uint32_t linked_list_search(LinkedListHandle handle, void *data) {
-    VALIDATE_HANDLE(handle);
+int32_t linked_list_search(LinkedListHandle handle, void *data) {
+    VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
-    // TODO
+    size_t                           node_location = 0;
+
+    for (dsa_node_t *current_node = list->head; current_node; current_node=current_node->next_node, node_location++) {
+        if (current_node->data == data) {
+            return node_location;
+        }
+    }
+
     return -1;
 }
 
 bool linked_list_is_empty(LinkedListHandle handle) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, true);
 
     return ((((dsa_linked_list_control_block_t*)handle)->list_length == 0) ? true : false);
 }
 
 int linked_list_get_list_size(LinkedListHandle handle) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, -1);
 
     return ((dsa_linked_list_control_block_t*)handle)->list_length;
 }
 
 void linked_list_print(LinkedListHandle handle, void(*data_printer)(void *)) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle,);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
 
@@ -500,7 +573,7 @@ void linked_list_print(LinkedListHandle handle, void(*data_printer)(void *)) {
 }
 
 void *linked_list_iter_next(LinkedListHandle handle, void *last_data_ptr) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, NULL);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
 
@@ -530,7 +603,7 @@ void *linked_list_iter_next(LinkedListHandle handle, void *last_data_ptr) {
 }
 
 void *linked_list_iter_previous(LinkedListHandle handle, void *last_data_ptr) {
-    VALIDATE_HANDLE(handle);
+    VALIDATE_HANDLE(handle, NULL);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
 
