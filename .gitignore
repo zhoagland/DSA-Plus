@@ -48,7 +48,7 @@ _deps
 
 .cache/*
 build/
-
+out/
 [Oo][Uu][Tt]/
 [Bb][Uu][Ii][Ll][Dd]/
 /.vs

@@ -13,39 +13,16 @@ set(CMAKE_C_STANDARD            11)
 set(CMAKE_C_STANDARD_REQUIRED   ON)
 set(CMAKE_C_EXTENSIONS          OFF)
 
+# Assuming your logo and icon are in an assets directory relative to your project root.
+set(PROJECT_LOGO_PATH "${CMAKE_SOURCE_DIR}/assets/logo.png")
+set(PROJECT_ICON_PATH "${CMAKE_SOURCE_DIR}/assets/icon.ico")
 
-
+# Source code for all the libraries
 add_subdirectory(src)
 
-configure_file(config.h.in config.h)
-
-
-install(FILES "${PROJECT_BINARY_DIR}/config.h" DESTINATION include )
-
-# --- Start of FetchContent configuration ---
-include(FetchContent)
-
-# Declare the content to be fetched. We use the official GoogleTest git repository.
-FetchContent_Declare(
-  googletest
-  GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG        v1.17.0
-)
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-# Make the content available. This downloads and adds it to the build.
-FetchContent_MakeAvailable(googletest)
-enable_testing()
-
-FetchContent_Declare(
-  doxygen-awesome-css
-  GIT_REPOSITORY https://github.com/jothepro/doxygen-awesome-css.git
-  GIT_TAG        568f56cde6ac78b6dfcc14acd380b2e745c301ea
-)
-
-FetchContent_MakeAvailable(doxygen-awesome-css)
-# --- End of FetchContent configuration ---
-
+# Add docs package
 add_subdirectory(docs)
 
-#CTest Settings
-add_subdirectory(Unit_Tests)
+# Add unit test package
+add_subdirectory(unit_tests)
+

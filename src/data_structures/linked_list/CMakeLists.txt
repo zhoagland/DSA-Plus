@@ -31,5 +31,18 @@ target_link_libraries(dsa_linked_list PUBLIC
     dsa_macros_header
 )
 
-# Set the public header for installation (optional, but good practice)
-install(TARGETS dsa_linked_list PUBLIC_HEADER DESTINATION include)
+# Set the public header for installation. This is the correct way to
+# install headers linked via an INTERFACE library.
+install(
+    TARGETS dsa_linked_list dsa_linked_list_public_headers dsa_macros_header
+    EXPORT dsa_linked_list_export
+    PUBLIC_HEADER
+    ARCHIVE DESTINATION lib
+)
+
+# This is a key step: install the generated export file.
+install(
+    EXPORT dsa_linked_list_export
+    DESTINATION lib/cmake/dsa_linked_list
+    NAMESPACE dsa::
+)
