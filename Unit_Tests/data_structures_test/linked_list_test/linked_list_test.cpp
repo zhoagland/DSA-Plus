@@ -8,8 +8,6 @@ namespace Linked_List {
     #define CL Circularly_Linked
 
 
-
-
     // Helper data for tests
     int test_data[] = {0, 1, 2, 3, 4};
 
@@ -20,31 +18,50 @@ namespace Linked_List {
 
     TEST(SL, Init) {
         LinkedListHandle handle = linked_list_initialize(SINGLY_LINKED_LIST, &test_data);
-        ASSERT_NE(handle, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t*)handle)->list_length , 1);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head->data, &test_data);
-
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head,
-                  ((dsa_linked_list_control_block_t *)handle)->tail);
-
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head->next_node, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head->previous_node, nullptr);
+        auto list = ((dsa_linked_list_control_block_t *)handle);
         
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->tail->next_node, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->tail->previous_node, nullptr);
+        // Handle shouldn't be null.
+        ASSERT_NE(handle, nullptr);
+
+        // List length should be one with an initializer data
+        ASSERT_EQ(list->list_length , 1);
+        
+        // Data addresses should match
+        ASSERT_EQ(list->head->data, &test_data);
+
+        // With only one node head should also be tail
+        ASSERT_EQ(list->head, list->tail);
+
+        // Head next node should be null. Only one node.
+        ASSERT_EQ(list->head->next_node, nullptr);
+
+        // Previous should be null as singly linked
+        ASSERT_EQ(list->head->previous_node, nullptr);
+
+        // Tail should always point to null in singly linked
+        ASSERT_EQ(list->tail->next_node, nullptr);
+
+        // No node should point to a previous in a singly linked list.
+        ASSERT_EQ(list->tail->previous_node, nullptr);
 
 
         LinkedListHandle handle2 = linked_list_initialize(SINGLY_LINKED_LIST, NULL);
+        auto list2    = ((dsa_linked_list_control_block_t *)handle2);
+
+        // Handle again should not be null
         ASSERT_NE(handle2, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->list_length, 0);
 
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->head,
-                  ((dsa_linked_list_control_block_t *)handle2)->tail);
+        // Length should be zero because initialized without a data pointer.
+        ASSERT_EQ(list2->list_length, 0);
 
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->head, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->tail, nullptr);
+        // No nodes in the list so head and tail should be null.
+        ASSERT_EQ(list2->head, nullptr);
+        ASSERT_EQ(list2->tail, nullptr);
 
-
+        // Again both null so they should equal each other.
+        ASSERT_EQ(list2->head,list2->tail);
+        
+        // Handles should not be the same.
         ASSERT_NE(handle, handle2);
 
         linked_list_delete(&handle);
@@ -54,31 +71,45 @@ namespace Linked_List {
     
     TEST(DL, Init) {
         LinkedListHandle handle = linked_list_initialize(DOUBLY_LINKED_LIST, &test_data);
+        auto list   = ((dsa_linked_list_control_block_t *)handle);
+        
+        // Handle should be assigned
         ASSERT_NE(handle, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->list_length, 1);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head->data, &test_data);
+        
+        // List should be length one
+        ASSERT_EQ(list->list_length, 1);
+        
+        // Data should point to test data
+        ASSERT_EQ(list->head->data, &test_data);
 
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head,
-                  ((dsa_linked_list_control_block_t *)handle)->tail);
+        // Only one node so head and tail should be the same.
+        ASSERT_EQ(list->head, list->tail);
 
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head->next_node, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head->previous_node, nullptr);
+        // Only one node head should point to null.
+        ASSERT_EQ(list->head->next_node, nullptr);
 
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->tail->next_node, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->tail->previous_node, nullptr);
+        // Only one node head previous should always be null.
+        ASSERT_EQ(list->head->previous_node, nullptr);
+
+        // Only one node so head is also the tail.
+        ASSERT_EQ(list->tail->next_node, nullptr);
+        ASSERT_EQ(list->tail->previous_node, nullptr);
 
         LinkedListHandle handle2 = linked_list_initialize(DOUBLY_LINKED_LIST, NULL);
+        auto list2 = ((dsa_linked_list_control_block_t *)handle2);
+
+        // Handle should be assigned.
         ASSERT_NE(handle2, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->list_length, 0);
+        
+        // Initialized with no data so length should be 0.
+        ASSERT_EQ(list2->list_length, 0);
+        
+        // Head and tail should be null thus equal each otherl
+        ASSERT_EQ(list2->head, list2->tail);
+        ASSERT_EQ(list2->head, nullptr);
+        ASSERT_EQ(list2->tail, nullptr);
 
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->head,
-                  ((dsa_linked_list_control_block_t *)handle2)->tail);
-
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->head, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->tail, nullptr);
-
-        ASSERT_NE(handle2, nullptr);
-
+        // Handles shouldn't equal each other.
         ASSERT_NE(handle, handle2);
 
         linked_list_delete(&handle);
@@ -89,34 +120,25 @@ namespace Linked_List {
     
     TEST(CL, Init) {
         LinkedListHandle handle = linked_list_initialize(CIRCULARLY_LINKED_LIST, &test_data);
+        auto list = ((dsa_linked_list_control_block_t *)handle);
+        
         ASSERT_NE(handle, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->list_length, 1);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head->data, &test_data);
-
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head,
-                  ((dsa_linked_list_control_block_t *)handle)->tail);
-
-        ASSERT_NE(((dsa_linked_list_control_block_t *)handle)->head->next_node, nullptr);
-
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->head->previous_node,
-                  ((dsa_linked_list_control_block_t *)handle)->tail);
-
-        ASSERT_NE(((dsa_linked_list_control_block_t *)handle)->tail->previous_node, nullptr);
-
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle)->tail->next_node,
-                  ((dsa_linked_list_control_block_t *)handle)->head);
+        ASSERT_EQ(list->list_length, 1);
+        ASSERT_EQ(list->head->data, &test_data);
+        ASSERT_EQ(list->head, list->tail);
+        ASSERT_NE(list->head->next_node, nullptr);
+        ASSERT_EQ(list->head->previous_node, list->tail);
+        ASSERT_NE(list->tail->previous_node, nullptr);
+        ASSERT_EQ(list->tail->next_node, list->head);
 
         LinkedListHandle handle2 = linked_list_initialize(CIRCULARLY_LINKED_LIST, NULL);
+        auto list2 = ((dsa_linked_list_control_block_t *)handle2);
 
         ASSERT_NE(handle2, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->list_length, 0);
-
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->head,
-                  ((dsa_linked_list_control_block_t *)handle2)->tail);
-
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->head, nullptr);
-        ASSERT_EQ(((dsa_linked_list_control_block_t *)handle2)->tail, nullptr);
-
+        ASSERT_EQ(list2->list_length, 0);
+        ASSERT_EQ(list2->head, list2->tail);
+        ASSERT_EQ(list2->head, nullptr);
+        ASSERT_EQ(list2->tail, nullptr);
         ASSERT_NE(handle, handle2);
 
         linked_list_delete(&handle);
