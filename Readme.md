@@ -31,12 +31,12 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">DSA Plust</h3>
+<h3 align="center">DSA Plus</h3>
 
   <p align="center">
-    A Data structures and algorithms library in C plus other utilities such as memory allocators, common macros, and bitwise twiddling.
+    A data structures and algorithms library in C plus other utilities such as memory allocators, common macros, and bitwise twiddling.
     <br />
-    <a href="https://github.com/zhoagland/DSA-Plus"><strong>Explore the docs »</strong></a>
+    <a href="https://zacharyhoagland.com/construction""><strong>Explore the docs »</strong></a>
     <br />
     <br />
     <a href="https://github.com/zhoagland/DSA-Plus">View Demo</a>

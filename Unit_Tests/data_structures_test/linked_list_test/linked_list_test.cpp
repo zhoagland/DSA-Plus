@@ -3,9 +3,11 @@
 #include "linked_list_internal.h"
 
 namespace Linked_List {
-    #define SL Singly_Linked
-    #define DL Doubly_Linked
-    #define CL Circularly_Linked
+
+#define SL Singly_Linked
+#define DL Doubly_Linked
+#define CSL Circular_Singly_Linked
+#define CDL Circular_Doubly_Linked
 
 
     // Helper data for tests
@@ -18,14 +20,14 @@ namespace Linked_List {
 
     TEST(SL, Init) {
         LinkedListHandle handle = linked_list_initialize(SINGLY_LINKED_LIST, &test_data);
-        auto list = ((dsa_linked_list_control_block_t *)handle);
-        
+        auto             list   = ((dsa_linked_list_control_block_t *)handle);
+
         // Handle shouldn't be null.
         ASSERT_NE(handle, nullptr);
 
         // List length should be one with an initializer data
-        ASSERT_EQ(list->list_length , 1);
-        
+        ASSERT_EQ(list->list_length, 1);
+
         // Data addresses should match
         ASSERT_EQ(list->head->data, &test_data);
 
@@ -46,7 +48,7 @@ namespace Linked_List {
 
 
         LinkedListHandle handle2 = linked_list_initialize(SINGLY_LINKED_LIST, NULL);
-        auto list2    = ((dsa_linked_list_control_block_t *)handle2);
+        auto             list2   = ((dsa_linked_list_control_block_t *)handle2);
 
         // Handle again should not be null
         ASSERT_NE(handle2, nullptr);
@@ -59,8 +61,8 @@ namespace Linked_List {
         ASSERT_EQ(list2->tail, nullptr);
 
         // Again both null so they should equal each other.
-        ASSERT_EQ(list2->head,list2->tail);
-        
+        ASSERT_EQ(list2->head, list2->tail);
+
         // Handles should not be the same.
         ASSERT_NE(handle, handle2);
 
@@ -68,17 +70,17 @@ namespace Linked_List {
         linked_list_delete(&handle2);
     }
 
-    
+
     TEST(DL, Init) {
         LinkedListHandle handle = linked_list_initialize(DOUBLY_LINKED_LIST, &test_data);
-        auto list   = ((dsa_linked_list_control_block_t *)handle);
-        
+        auto             list   = ((dsa_linked_list_control_block_t *)handle);
+
         // Handle should be assigned
         ASSERT_NE(handle, nullptr);
-        
+
         // List should be length one
         ASSERT_EQ(list->list_length, 1);
-        
+
         // Data should point to test data
         ASSERT_EQ(list->head->data, &test_data);
 
@@ -96,14 +98,14 @@ namespace Linked_List {
         ASSERT_EQ(list->tail->previous_node, nullptr);
 
         LinkedListHandle handle2 = linked_list_initialize(DOUBLY_LINKED_LIST, NULL);
-        auto list2 = ((dsa_linked_list_control_block_t *)handle2);
+        auto             list2   = ((dsa_linked_list_control_block_t *)handle2);
 
         // Handle should be assigned.
         ASSERT_NE(handle2, nullptr);
-        
+
         // Initialized with no data so length should be 0.
         ASSERT_EQ(list2->list_length, 0);
-        
+
         // Head and tail should be null thus equal each otherl
         ASSERT_EQ(list2->head, list2->tail);
         ASSERT_EQ(list2->head, nullptr);
@@ -114,14 +116,13 @@ namespace Linked_List {
 
         linked_list_delete(&handle);
         linked_list_delete(&handle2);
-    
     }
 
-    
+
     TEST(CL, Init) {
-        LinkedListHandle handle = linked_list_initialize(CIRCULARLY_LINKED_LIST, &test_data);
-        auto list = ((dsa_linked_list_control_block_t *)handle);
-        
+        LinkedListHandle handle = linked_list_initialize(CIRCULAR_SINGLY_LINKED_LIST, &test_data);
+        auto             list   = ((dsa_linked_list_control_block_t *)handle);
+
         ASSERT_NE(handle, nullptr);
         ASSERT_EQ(list->list_length, 1);
         ASSERT_EQ(list->head->data, &test_data);
@@ -131,8 +132,8 @@ namespace Linked_List {
         ASSERT_NE(list->tail->previous_node, nullptr);
         ASSERT_EQ(list->tail->next_node, list->head);
 
-        LinkedListHandle handle2 = linked_list_initialize(CIRCULARLY_LINKED_LIST, NULL);
-        auto list2 = ((dsa_linked_list_control_block_t *)handle2);
+        LinkedListHandle handle2 = linked_list_initialize(CIRCULAR_SINGLY_LINKED_LIST, NULL);
+        auto             list2   = ((dsa_linked_list_control_block_t *)handle2);
 
         ASSERT_NE(handle2, nullptr);
         ASSERT_EQ(list2->list_length, 0);
@@ -143,14 +144,12 @@ namespace Linked_List {
 
         linked_list_delete(&handle);
         linked_list_delete(&handle2);
-    
     }
 
     TEST(SL, Delete) {
         LinkedListHandle handle = linked_list_initialize(SINGLY_LINKED_LIST, &test_data);
         ASSERT_EQ(linked_list_delete(&handle), 0);
         ASSERT_EQ(handle, nullptr);
-
     }
 
     TEST(DL, Delete) {
@@ -159,12 +158,12 @@ namespace Linked_List {
     }
 
     TEST(CL, Delete) {
-        LinkedListHandle handle = linked_list_initialize(CIRCULARLY_LINKED_LIST, &test_data);
+        LinkedListHandle handle = linked_list_initialize(CIRCULAR_SINGLY_LINKED_LIST, &test_data);
         ASSERT_EQ(linked_list_delete(&handle), 0);
     }
 
     TEST(SL, Mapped_Action_On_Delete) {
-        auto mapped_act_on_del  = [](void *data) { printf("Data Deleted %d", *(int *)data); };
+        auto mapped_act_on_del = [](void *data) { printf("Data Deleted %d", *(int *)data); };
 
         LinkedListHandle handle = linked_list_initialize(SINGLY_LINKED_LIST, &test_data);
         ASSERT_EQ(linked_list_mapped_action_on_delete(&handle, mapped_act_on_del), 0);
@@ -274,7 +273,7 @@ namespace Linked_List {
         LinkedListHandle handle = linked_list_initialize(SINGLY_LINKED_LIST, nullptr);
         linked_list_insert_back(handle, &test_data);
         ASSERT_EQ(linked_list_iter_previous(handle, &test_data),
-                    nullptr);  // depends on implementation
+                  nullptr);  // depends on implementation
         linked_list_delete(&handle);
     }
 
@@ -282,7 +281,7 @@ namespace Linked_List {
         LinkedListHandle handle = linked_list_initialize(SINGLY_LINKED_LIST, nullptr);
         linked_list_insert_back(handle, &test_data);
         ASSERT_EQ(linked_list_iter_next(handle, &test_data),
-                    nullptr);  // depends on implementation
+                  nullptr);  // depends on implementation
         linked_list_delete(&handle);
     }
 
@@ -297,8 +296,8 @@ namespace Linked_List {
     TEST(SL, Print) {
         LinkedListHandle handle = linked_list_initialize(SINGLY_LINKED_LIST, nullptr);
         linked_list_insert_back(handle, &test_data);
-        auto printer = [](void *data) {};
-        linked_list_print(handle, printer);
+        auto printer = [](FILE *output, void *data) {};
+        linked_list_print(handle, printer, stdout);
         linked_list_delete(&handle);
     }
 

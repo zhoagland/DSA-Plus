@@ -24,13 +24,11 @@
       ]
     },
     {
-      "name": "x86-Release",
+      "name": "x86-Release-CVI",
       "generator": "Ninja",
       "configurationType": "Release",
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
-      "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "inheritEnvironments": [ "msvc_x86" ],
       "variables": [
@@ -46,6 +44,52 @@
         },
         {
           "name": "BUILD_TESTING",
+          "value": "False",
+          "type": "BOOL"
+        },
+        {
+          "name": "BUILD_DOCS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LABWINDOWS_CVI_COMPATIBILITY",
+          "value": "True",
+          "type": "BOOL"
+        }
+      ]
+    },
+    {
+      "name": "x86-Release",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "buildRoot": "${projectDir}\\out\\build\\${name}",
+      "installRoot": "${projectDir}\\out\\install\\${name}",
+      "ctestCommandArgs": "",
+      "inheritEnvironments": [ "msvc_x86" ],
+      "variables": [
+        {
+          "name": "INSTALL_GTEST",
+          "value": "False",
+          "type": "BOOL"
+        },
+        {
+          "name": "BUILD_GMOCK",
+          "value": "False",
+          "type": "BOOL"
+        },
+        {
+          "name": "BUILD_TESTING",
+          "value": "False",
+          "type": "BOOL"
+        },
+        {
+          "name": "BUILD_DOCS",
+          "value": "True",
+          "type": "BOOL"
+        },
+        {
+          "name": "LABWINDOWS_CVI_COMPATIBILITY",
           "value": "False",
           "type": "BOOL"
         }

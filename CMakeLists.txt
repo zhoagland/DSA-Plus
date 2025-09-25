@@ -1,6 +1,11 @@
 #set cmake version
 cmake_minimum_required(VERSION 3.28)
 
+#set language settings
+set(CMAKE_C_STANDARD            11)
+set(CMAKE_C_STANDARD_REQUIRED   ON)
+set(CMAKE_C_EXTENSIONS          OFF)
+
 #set project name
 project(DSA_Plus
         VERSION 1.0
@@ -8,10 +13,11 @@ project(DSA_Plus
         LANGUAGES C
 )
 
-#set language settings
-set(CMAKE_C_STANDARD            11)
-set(CMAKE_C_STANDARD_REQUIRED   ON)
-set(CMAKE_C_EXTENSIONS          OFF)
+option(LABWINDOWS_CVI_COMPATIBILITY "Make the lib link against the cvirte not msvc rte" OFF)
+
+if(LABWINDOWS_CVI_COMPATIBILITY)
+       add_definitions(-D_CVI_LIB_=1)
+endif()
 
 # Assuming your logo and icon are in an assets directory relative to your project root.
 set(PROJECT_LOGO_PATH "${CMAKE_SOURCE_DIR}/assets/logo.png")

@@ -1,5 +1,5 @@
 /**
- * @file macros.h
+ * @file dsa_macros.h
  * @author Zachary Hoagland (zach@zacharyhoagland.com)
  * @brief Header file for common macros used in the library
  * @version 1.0
