@@ -14,9 +14,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <threads.h>
 
 /* -------------------- Private Macros/Defines ------------------------------------- */
+DECLARE_HANDLE(LinkedListHandle);
+
 /* -------------------- Private Enums ---------------------------------------------- */
 
 /* -------------------- Private Structs -------------------------------------------- */

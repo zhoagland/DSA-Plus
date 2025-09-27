@@ -23,9 +23,9 @@
 #include <stdbool.h>
 
 /* -------------------- Public Macros/Defines --------------------------- */
-DECLARE_HANDLE(LinkedListHandle);
+typedef struct LinkedListHandle__* LinkedListHandle;
 
-/* -------------------- Public Enums ------------------------------------ */
+    /* -------------------- Public Enums ------------------------------------ */
 typedef enum dsa_list_type {
     SINGLY_LINKED_LIST,
     DOUBLY_LINKED_LIST,

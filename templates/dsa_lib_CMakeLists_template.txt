@@ -1,0 +1,50 @@
+#FIND AND REPALCE 'DSA_LIB_TEMPLATE' WITH LIBRARY NAME
+
+# This file defines the DSA_LIB_TEMPLATE library
+
+# Build the main static library. Only list source files here.
+add_library(DSA_LIB_TEMPLATE STATIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/linked_list.c"
+)
+
+# Add the required include paths for the DSA_LIB_TEMPLATE source file.
+# The `PRIVATE` keyword means this include path is for internal use only.
+target_include_directories(DSA_LIB_TEMPLATE PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+# This INTERFACE library holds the public header file.
+# Any target that links to `DSA_LIB_TEMPLATE` will get this include path automatically.
+add_library(DSA_LIB_TEMPLATE_public_headers INTERFACE)
+# We explicitly list ONLY the public header in the PUBLIC_HEADER property.
+set_target_properties(DSA_LIB_TEMPLATE_public_headers PROPERTIES
+    PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/linked_list.h"
+)
+
+# This INTERFACE library holds the headers for unit testing purposes.
+add_library(DSA_LIB_TEMPLATE_test_headers INTERFACE)
+target_include_directories(DSA_LIB_TEMPLATE_test_headers INTERFACE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+
+# Link the static library to its public headers.
+target_link_libraries(DSA_LIB_TEMPLATE PUBLIC 
+    DSA_LIB_TEMPLATE_public_headers
+    dsa_macros_header
+)
+
+# Set the public header for installation. This is the correct way to
+# install headers linked via an INTERFACE library.
+install(
+    TARGETS DSA_LIB_TEMPLATE DSA_LIB_TEMPLATE_public_headers dsa_macros_header
+    EXPORT DSA_LIB_TEMPLATE_export
+    PUBLIC_HEADER
+    ARCHIVE DESTINATION lib
+)
+
+# This is a key step: install the generated export file.
+install(
+    EXPORT DSA_LIB_TEMPLATE_export
+    DESTINATION lib/cmake/DSA_LIB_TEMPLATE
+    NAMESPACE dsa::
+)
