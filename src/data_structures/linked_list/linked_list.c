@@ -1,27 +1,37 @@
 /**
-* @file linked_list.c
-* @author Zachary Hoagland (zach@zacharyhoagland.com)
-* @brief
-* @version 0.1
-* @date 2025-04-03
-*
-* @copyright Copyright (c) 2025
-*
-*/
+ * @file linked_list.c
+ * @author Zachary Hoagland (zach@zacharyhoagland.com)
+ * @brief
+ * @version 0.1
+ * @date 2025-04-03
+ *
+ * @copyright Copyright (c) 2025
+ *
+ */
 /* -------------------- Private Includes ------------------------------------------- */
 #include "linked_list.h"
 #include "linked_list_internal.h"
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <threads.h>
+
+
+#ifndef _CVI_LIB_
+    #include <stdio.h>
+    #include <stdint.h>
+    #include <stdlib.h>
+#else
+    #include "C:\Program Files (x86)\National Instruments\CVI2020\include\ansi\stdio.h"
+    #include "C:\Program Files (x86)\National Instruments\CVI2020\include\ansi\stdint.h"
+    #include "C:\Program Files (x86)\National Instruments\CVI2020\include\ansi\stdlib.h"
+#endif  // !_CVI_LIB_
 
 /* -------------------- Private Macros/Defines ------------------------------------- */
 DECLARE_HANDLE(LinkedListHandle);
 
+/* -------------------- Private Macros/Defines ------------------------------------- */
 /* -------------------- Private Enums ---------------------------------------------- */
 
+
 /* -------------------- Private Structs -------------------------------------------- */
+
 
 /* -------------------- Private (static) Vars -------------------------------------- */
 
@@ -35,8 +45,8 @@ const char *ll_error_messages[] = {
 
 #ifdef __DSA_ERROR_HANDLING
 static dsa_ll_error_codes_t get_error_code_override_(void *p_error);
-static char *get_error_message_override_(void *p_error);
-static void ll_error_ctor(dsa_ll_error_t *const self);
+static char                *get_error_message_override_(void *p_error);
+static void                 ll_error_ctor(dsa_ll_error_t *const self);
 #endif /* __DSA_ERROR_HANDLING */
 /* -------------------- Public (global) Vars --------------------------------------- */
 
@@ -46,22 +56,21 @@ static void ll_error_ctor(dsa_ll_error_t *const self);
 /* Error Handling Class Methods */
 #ifdef __DSA_ERROR_HANDLING
 char *get_error_message_override_(void *p_error) {
-    dsa_ll_error_t *local_error = ((dsa_error_t*)p_error);
+    dsa_ll_error_t *local_error = ((dsa_error_t *)p_error);
 
     return ll_error_messages[local_error->error_code];
 }
 
 static dsa_ll_error_codes_t get_error_code_override_(void *p_error) {
-    dsa_ll_error_t *local_error = ((dsa_error_t*)p_error);
+    dsa_ll_error_t *local_error = ((dsa_error_t *)p_error);
 
-    return (local_error->error_code)*-1;
+    return (local_error->error_code) * -1;
 }
 
 static void ll_error_ctor(dsa_ll_error_t *const self) {
-    static const dsa_error_vtbl_t glob_error_vtbl = {
-        .get_error_code = &get_error_code_override_,
-        .get_error_message = &get_error_message_override_
-    };
+    static const dsa_error_vtbl_t glob_error_vtbl = {.get_error_code = &get_error_code_override_,
+                                                     .get_error_message =
+                                                         &get_error_message_override_};
 
     error_ctor(&self->glob_error);
 
@@ -69,13 +78,13 @@ static void ll_error_ctor(dsa_ll_error_t *const self) {
 }
 
 int linked_list_get_error_code(LinkedListHandle handle) {
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
 
     return (int)get_error_code(&list->error);
 }
 
 char *linked_list_get_error_message(LinkedListHandle handle) {
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
 
     return get_error_message(&list->error);
 }
@@ -84,18 +93,18 @@ char *linked_list_get_error_message(LinkedListHandle handle) {
 
 /* Module Methods */
 
-LinkedListHandle linked_list_initialize(dsa_list_type_t list_type, void *data) {
-
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)calloc(1, sizeof(dsa_linked_list_control_block_t));
+LinkedListHandle __cdecl linked_list_initialize(dsa_list_type_t list_type, void *data) {
+    dsa_linked_list_control_block_t *list =
+        (dsa_linked_list_control_block_t *)calloc(1, sizeof(dsa_linked_list_control_block_t));
 
     if (!list) {
         return NULL;
     }
 
-    list->list_type = list_type;
+    list->list_type   = list_type;
     list->list_length = 0;
-    list->head = NULL;
-    list->tail = NULL;
+    list->head        = NULL;
+    list->tail        = NULL;
 
     if (data) {
         linked_list_insert_front((LinkedListHandle)list, data);
@@ -104,16 +113,17 @@ LinkedListHandle linked_list_initialize(dsa_list_type_t list_type, void *data) {
     return (LinkedListHandle)list;
 }
 
-int linked_list_delete(LinkedListHandle *handle) {
+int __cdecl linked_list_delete(LinkedListHandle *handle) {
     VALIDATE_HANDLE(*handle, -1);
 
     dsa_node_t *next_node = NULL;
 
     // Loop through all the nodes in the list.
-    for (dsa_node_t *current_node = (*((dsa_linked_list_control_block_t **)handle))->head; current_node != NULL;) {
+    for (dsa_node_t *current_node = (*((dsa_linked_list_control_block_t **)handle))->head;
+         current_node != NULL;) {
         // Store the next node into memory;
         next_node = current_node->next_node;
-        
+
         // Check to see if node points to itself
         if (next_node == current_node) {
             next_node = NULL;
@@ -126,13 +136,14 @@ int linked_list_delete(LinkedListHandle *handle) {
     }
 
     // Free the control block
-    free(*(dsa_linked_list_control_block_t**)handle);
+    free(*(dsa_linked_list_control_block_t **)handle);
     *handle = NULL;
 
     return 0;
 }
 
-int linked_list_mapped_action_on_delete(LinkedListHandle *handle, void(*mapping_fnc)(void *data)) {
+int __cdecl linked_list_mapped_action_on_delete(LinkedListHandle *handle,
+                                                void(__cdecl *mapping_fnc)(void *data)) {
     VALIDATE_HANDLE(*handle, -1);
 
     linked_list_map_data(*handle, mapping_fnc);
@@ -140,13 +151,13 @@ int linked_list_mapped_action_on_delete(LinkedListHandle *handle, void(*mapping_
     return 0;
 }
 
-int linked_list_insert_front(LinkedListHandle handle, void *data) {
+int __cdecl linked_list_insert_front(LinkedListHandle handle, void *data) {
     VALIDATE_HANDLE(handle, -1);
 
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
 
     dsa_node_t *previous_head = list->head;
-    list->head = (dsa_node_t*)calloc(1, sizeof(dsa_node_t));
+    list->head                = (dsa_node_t *)calloc(1, sizeof(dsa_node_t));
 
     if (!list->head) {
         return -1;
@@ -160,8 +171,8 @@ int linked_list_insert_front(LinkedListHandle handle, void *data) {
 
     switch (list->list_type) {
         case SINGLY_LINKED_LIST:
-            list->head->next_node = previous_head;
-            list->head->previous_node    = NULL;
+            list->head->next_node     = previous_head;
+            list->head->previous_node = NULL;
 
             if (previous_head) {
                 previous_head->previous_node = NULL;
@@ -180,42 +191,41 @@ int linked_list_insert_front(LinkedListHandle handle, void *data) {
 
             break;
 
-        case CIRCULARLY_LINKED_LIST:
-            
-
+        case CIRCULAR_SINGLY_LINKED_LIST:
             if (previous_head) {
-                list->head->next_node = previous_head;
+                list->head->next_node        = previous_head;
                 previous_head->previous_node = list->head;
-            } else if(list->list_length == 0 ){
-                list->head->next_node = list->head;     
+            } else if (list->list_length == 0) {
+                list->head->next_node = list->head;
             } else {
-                list->head->next_node = NULL;               
+                list->head->next_node = NULL;
             }
 
             list->head->previous_node = list->tail;
 
             break;
 
-        default:
-            break;
+        case CIRCULAR_DOUBLY_LINKED_LIST:
+            // TODO
+           break;
     }
 
     list->list_length++;
 
-    return  0;
+    return 0;
 }
 
-int linked_list_insert_back(LinkedListHandle handle, void *data) {
+int __cdecl linked_list_insert_back(LinkedListHandle handle, void *data) {
     VALIDATE_HANDLE(handle, -1);
 
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
-    dsa_node_t *previous_tail = list->tail;
+    dsa_linked_list_control_block_t *list          = (dsa_linked_list_control_block_t *)handle;
+    dsa_node_t                      *previous_tail = list->tail;
 
-    if(list->list_length == 0) {
+    if (list->list_length == 0) {
         return linked_list_insert_front(handle, data);
     }
 
-    list->tail = (dsa_node_t*)calloc(1, sizeof(dsa_node_t));
+    list->tail = (dsa_node_t *)calloc(1, sizeof(dsa_node_t));
 
     if (!list->tail) {
         return -1;
@@ -225,19 +235,22 @@ int linked_list_insert_back(LinkedListHandle handle, void *data) {
 
     switch (list->list_type) {
         case SINGLY_LINKED_LIST:
-            previous_tail->next_node = list->tail;
-            list->tail->next_node = NULL;
+            previous_tail->next_node  = list->tail;
+            list->tail->next_node     = NULL;
             list->tail->previous_node = NULL;
             break;
         case DOUBLY_LINKED_LIST:
-            previous_tail->next_node = list->tail;
-            list->tail->next_node = NULL;
+            previous_tail->next_node  = list->tail;
+            list->tail->next_node     = NULL;
             list->tail->previous_node = previous_tail;
             break;
-        case CIRCULARLY_LINKED_LIST:
-            previous_tail->next_node = list->tail;
-            list->tail->next_node = list->head;
+        case CIRCULAR_SINGLY_LINKED_LIST:
+            previous_tail->next_node  = list->tail;
+            list->tail->next_node     = list->head;
             list->tail->previous_node = previous_tail;
+            break;
+        case CIRCULAR_DOUBLY_LINKED_LIST:
+            // TODO 
             break;
     }
 
@@ -246,45 +259,46 @@ int linked_list_insert_back(LinkedListHandle handle, void *data) {
     return 0;
 }
 
-int linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data) {
+int __cdecl linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data) {
     VALIDATE_HANDLE(handle, -1);
 
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
 
-    if(location >= list->list_length) {
+    if (location >= list->list_length) {
         return linked_list_insert_back(handle, data);
     }
-    if(location == 0) {
-        return  linked_list_insert_front(handle, data);
+    if (location == 0) {
+        return linked_list_insert_front(handle, data);
     }
 
     dsa_node_t *current_node = list->head;
-    dsa_node_t *next_node = list->head->next_node;
+    dsa_node_t *next_node    = list->head->next_node;
 
-    for(size_t loc = 0; loc < location; loc++) {
+    for (size_t loc = 0; loc < location - 1; loc++) {
         current_node = current_node->next_node;
-        next_node = current_node->next_node;
+        next_node    = current_node->next_node;
     }
 
-    current_node->next_node = (dsa_node_t*)calloc(1, sizeof(dsa_node_t));
+    current_node->next_node = (dsa_node_t *)calloc(1, sizeof(dsa_node_t));
 
     if (!current_node->next_node) {
         return -1;
     }
 
     switch (list->list_type) {
-        case SINGLY_LINKED_LIST:
-
-            current_node->next_node->data = data;
-            current_node->next_node->next_node=next_node;
+       case CIRCULAR_SINGLY_LINKED_LIST: 
+       case SINGLY_LINKED_LIST:
+            current_node->next_node->data      = data;
+            current_node->next_node->next_node = next_node;
             break;
 
-        case CIRCULARLY_LINKED_LIST:
+        
+        case CIRCULAR_DOUBLY_LINKED_LIST:
         case DOUBLY_LINKED_LIST:
-            current_node->next_node->data = data;
-            current_node->next_node->next_node=next_node;
-            current_node->next_node->previous_node=current_node;
-            next_node->previous_node=current_node->next_node;
+            current_node->next_node->data          = data;
+            current_node->next_node->next_node     = next_node;
+            current_node->next_node->previous_node = current_node;
+            next_node->previous_node               = current_node->next_node;
             break;
     }
 
@@ -293,26 +307,29 @@ int linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data
     return 0;
 }
 
-int linked_list_insert_sorted(LinkedListHandle handle, void *data, int(*cmpfunc)(void* a,void* b)) {
+int __cdecl linked_list_insert_sorted(LinkedListHandle handle, void *data,
+                                      int(__cdecl *cmpfunc)(void *a, void *b)) {
     VALIDATE_HANDLE(handle, -1);
 
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
-    uint32_t loop_iter = 0;
-    dsa_node_t *node = NULL;
-    node = list->head;
+    dsa_linked_list_control_block_t *list      = (dsa_linked_list_control_block_t *)handle;
+    uint32_t                         loop_iter = 0;
+    dsa_node_t                      *node      = NULL;
+    node                                       = list->head;
 
     do {
+        // 	  Cmp func logic
         //    a negative result if a < b
         //    0 if a == b
-        //    a positive result if b > a
+        //    a positive result if a > b
 
         // Check to see if current node is the tail. If so just insert at end.
-        if((node) == ((dsa_linked_list_control_block_t*)handle)->tail) {
+        if ((node) == ((dsa_linked_list_control_block_t *)handle)->tail) {
             return linked_list_insert_back(handle, data);
         }
 
-        // If existing data is greater than new data insert at this point in the list.
-        if( (*cmpfunc)(data, node->data) > 0) {
+        //
+        int cmp_result = (*cmpfunc)(data, node->data);
+        if (cmp_result <= 0) {
             return linked_list_insert_at(handle, loop_iter, data);
         }
         // new data is greater than old data
@@ -321,20 +338,21 @@ int linked_list_insert_sorted(LinkedListHandle handle, void *data, int(*cmpfunc)
         }
         node = node->next_node;
         loop_iter++;
-    } while(node);
+    } while (node);
 
     list->list_length++;
     return 0;
 }
 
-int linked_list_remove_front(LinkedListHandle handle, void (*fnc_on_removal)(void *data)) {
+int __cdecl linked_list_remove_front(LinkedListHandle handle,
+                                     void(__cdecl *fnc_on_removal)(void *data)) {
     VALIDATE_HANDLE(handle, -1);
 
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_linked_list_control_block_t *list     = (dsa_linked_list_control_block_t *)handle;
     dsa_node_t                      *old_head = list->head;
 
     // Check to see if there are nodes to remove
-    if(list->list_length == 0) {
+    if (list->list_length == 0) {
         return -1;
     }
 
@@ -360,10 +378,11 @@ int linked_list_remove_front(LinkedListHandle handle, void (*fnc_on_removal)(voi
     return 0;
 }
 
-int linked_list_remove_back(LinkedListHandle handle, void (*fnc_on_removal)(void *data)) {
+int __cdecl linked_list_remove_back(LinkedListHandle handle,
+                                    void(__cdecl *fnc_on_removal)(void *data)) {
     VALIDATE_HANDLE(handle, -1);
 
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_linked_list_control_block_t *list     = (dsa_linked_list_control_block_t *)handle;
     dsa_node_t                      *old_tail = list->tail;
 
     // Check to see if there are nodes to remove
@@ -374,12 +393,11 @@ int linked_list_remove_back(LinkedListHandle handle, void (*fnc_on_removal)(void
     // If not singly linked the head needs to point to the previous of the old head.
     if (list->list_type != SINGLY_LINKED_LIST) {
         // Update the head to be the next node in the list
-        list->tail = old_tail->previous_node;
+        list->tail            = old_tail->previous_node;
         list->tail->next_node = old_tail->next_node;
     } else {
         for (dsa_node_t *current_node = list->head; current_node;
              current_node             = current_node->next_node) {
-
             // If not tail
             if (current_node->next_node) {
                 // If the nodes next node is the tail
@@ -405,14 +423,16 @@ int linked_list_remove_back(LinkedListHandle handle, void (*fnc_on_removal)(void
     return 0;
 }
 
-int linked_list_remove_node(LinkedListHandle handle, void *data, void (*fnc_on_removal)(void *data)) {
+int __cdecl linked_list_remove_node(LinkedListHandle handle, void *data,
+                                    void(__cdecl *fnc_on_removal)(void *data)) {
     return linked_list_remove_at(handle, linked_list_search(handle, data), fnc_on_removal);
 }
 
-int linked_list_remove_at(LinkedListHandle handle, uint32_t location, void(*fnc_on_removal)(void*data)) {
+int __cdecl linked_list_remove_at(LinkedListHandle handle, uint32_t location,
+                                  void(__cdecl *fnc_on_removal)(void *data)) {
     VALIDATE_HANDLE(handle, -1);
 
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_linked_list_control_block_t *list          = (dsa_linked_list_control_block_t *)handle;
     dsa_node_t                      *previous_node = NULL;
     dsa_node_t                      *current_node  = list->head;
     dsa_node_t                      *next_node     = NULL;
@@ -423,7 +443,7 @@ int linked_list_remove_at(LinkedListHandle handle, uint32_t location, void(*fnc_
     }
 
     // If node is end remove back
-    if (location == list->list_length) {
+    if (location == (list->list_length - 1)) {
         return linked_list_remove_back(handle, fnc_on_removal);
     }
 
@@ -433,13 +453,13 @@ int linked_list_remove_at(LinkedListHandle handle, uint32_t location, void(*fnc_
     }
 
     // Check to see if there are nodes to remove
-    if(list->list_length == 0) {
+    if (list->list_length == 0) {
         return -1;
     }
 
-    for (size_t loc = 0; loc < location; location++) {
+    for (size_t loc = 0; loc < location; loc++) {
         previous_node = current_node;
-        current_node = current_node->next_node;
+        current_node  = previous_node->next_node;
         next_node     = current_node->next_node;
     }
 
@@ -449,7 +469,7 @@ int linked_list_remove_at(LinkedListHandle handle, uint32_t location, void(*fnc_
         next_node->previous_node = previous_node;
     }
 
-    if (fnc_on_removal){
+    if (fnc_on_removal) {
         (*fnc_on_removal)(current_node->data);
     }
 
@@ -461,17 +481,21 @@ int linked_list_remove_at(LinkedListHandle handle, uint32_t location, void(*fnc_
     return 0;
 }
 
-void *linked_list_get_back(LinkedListHandle handle) {
+void *__cdecl linked_list_get_back(LinkedListHandle handle) {
     VALIDATE_HANDLE(handle, NULL);
 
-    return ((dsa_linked_list_control_block_t*)handle)->tail->data;
+    return ((dsa_linked_list_control_block_t *)handle)->tail->data;
 }
 
-void *linked_list_get_at(LinkedListHandle handle, uint32_t location) {
+void *__cdecl linked_list_get_at(LinkedListHandle handle, uint32_t location) {
     VALIDATE_HANDLE(handle, NULL);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
     dsa_node_t                      *node = list->head;
+
+    if (!node) {
+        return node;
+    }
 
     // If not singly linked list we can find which way is faster to traverse forward of backwards
     if (list->list_type != SINGLY_LINKED_LIST) {
@@ -488,41 +512,42 @@ void *linked_list_get_at(LinkedListHandle handle, uint32_t location) {
     }
 
     // If singly linked or from the front of the list is faster
-    for (uint32_t node_number = 0; node_number != location; node_number++) {
+    for (uint32_t node_number = 0; node_number != location && node; node_number++) {
         node = node->next_node;
     }
 
-    return node->data;
+    return node ? node->data : NULL;
 }
 
-void *get_front(LinkedListHandle handle) {
+void *__cdecl get_front(LinkedListHandle handle) {
     VALIDATE_HANDLE(handle, NULL);
 
-    return ((dsa_linked_list_control_block_t*)handle)->head->data;
+    return ((dsa_linked_list_control_block_t *)handle)->head->data;
 }
 
-int linked_list_map_data(LinkedListHandle handle, void(*mapping_fnc)(void* data)) {
+int __cdecl linked_list_map_data(LinkedListHandle handle, void(__cdecl *mapping_fnc)(void *data)) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_node_t *node = NULL;
 
-    node = ((dsa_linked_list_control_block_t*)handle)->head;
+    node = ((dsa_linked_list_control_block_t *)handle)->head;
 
-    do {
+    while (node) {
         (*mapping_fnc)(node->data);
         node = node->next_node;
-    } while(node);
+    };
 
     return 0;
 }
 
-int32_t linked_list_search(LinkedListHandle handle, void *data) {
+int32_t __cdecl linked_list_search(LinkedListHandle handle, void *data) {
     VALIDATE_HANDLE(handle, -1);
 
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_linked_list_control_block_t *list          = (dsa_linked_list_control_block_t *)handle;
     size_t                           node_location = 0;
 
-    for (dsa_node_t *current_node = list->head; current_node; current_node=current_node->next_node, node_location++) {
+    for (dsa_node_t *current_node = list->head; current_node;
+         current_node             = current_node->next_node, node_location++) {
         if (current_node->data == data) {
             return node_location;
         }
@@ -531,50 +556,52 @@ int32_t linked_list_search(LinkedListHandle handle, void *data) {
     return -1;
 }
 
-bool linked_list_is_empty(LinkedListHandle handle) {
+bool __cdecl linked_list_is_empty(LinkedListHandle handle) {
     VALIDATE_HANDLE(handle, true);
 
-    return ((((dsa_linked_list_control_block_t*)handle)->list_length == 0) ? true : false);
+    return ((((dsa_linked_list_control_block_t *)handle)->list_length == 0) ? true : false);
 }
 
-int linked_list_get_list_size(LinkedListHandle handle) {
+int __cdecl linked_list_get_list_size(LinkedListHandle handle) {
     VALIDATE_HANDLE(handle, -1);
 
-    return ((dsa_linked_list_control_block_t*)handle)->list_length;
+    return ((dsa_linked_list_control_block_t *)handle)->list_length;
 }
 
-void linked_list_print(LinkedListHandle handle, void(*data_printer)(void *)) {
-    VALIDATE_HANDLE(handle,);
+void __cdecl linked_list_print(LinkedListHandle handle,
+                               void(__cdecl *data_printer)(FILE *, void *), FILE *output_stream) {
+    VALIDATE_HANDLE(handle, );
 
-    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t*)handle;
+    dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
 
-    printf("List Length: %d\n", list->list_length);
+    fprintf(output_stream,"List Length: %d\n", list->list_length);
 
-    printf("List Type:");
+    fprintf(output_stream, "List Type: ");
     switch (list->list_type) {
         case SINGLY_LINKED_LIST:
-        printf("Singly Linked List\n");
-        break;
+            fprintf(output_stream, "Singly Linked List\n");
+            break;
         case DOUBLY_LINKED_LIST:
-        printf("Doubly Linked List\n");
-        break;
-        case CIRCULARLY_LINKED_LIST:
-        printf("Circularly Linked List\n");
-        break;
-    default:
-        break;
+            fprintf(output_stream, "Doubly Linked List\n");
+            break;
+        case CIRCULAR_SINGLY_LINKED_LIST:
+            fprintf(output_stream, "Circular Singly Linked List\n");
+            break;
+        case CIRCULAR_DOUBLY_LINKED_LIST:
+            fprintf(output_stream, "Circular Doubly Linked List\n");
+            break;
     }
 
-    for(uint32_t node_number = 0; node_number < list->list_length; node_number++) {
-        printf("Node %d\n Data:\n", node_number);
-        (*data_printer)(linked_list_get_at(handle, node_number));
-        printf("\n");
+    for (uint32_t node_number = 0; node_number < list->list_length; node_number++) {
+        fprintf(output_stream, "Node %d\n Data:\n", node_number);
+        (*data_printer)(output_stream, linked_list_get_at(handle, node_number));
+        fprintf(output_stream, "\n");
     }
 
     return;
 }
 
-void *linked_list_iter_next(LinkedListHandle handle, void *last_data_ptr) {
+void *__cdecl linked_list_iter_next(LinkedListHandle handle, void *last_data_ptr) {
     VALIDATE_HANDLE(handle, NULL);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
@@ -600,16 +627,16 @@ void *linked_list_iter_next(LinkedListHandle handle, void *last_data_ptr) {
             }
             current = current->next_node;
         }
-        return NULL; // Should not happen if last_data_ptr is valid
+        return NULL;  // Should not happen if last_data_ptr is valid
     }
 }
 
-void *linked_list_iter_previous(LinkedListHandle handle, void *last_data_ptr) {
+void *__cdecl linked_list_iter_previous(LinkedListHandle handle, void *last_data_ptr) {
     VALIDATE_HANDLE(handle, NULL);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
 
-    if(list->list_type == SINGLY_LINKED_LIST) {
+    if (list->list_type == SINGLY_LINKED_LIST) {
         return NULL;
     }
 
@@ -633,6 +660,6 @@ void *linked_list_iter_previous(LinkedListHandle handle, void *last_data_ptr) {
             }
             current = current->previous_node;
         }
-        return NULL; // Should not happen if last_data_ptr is valid
+        return NULL;  // Should not happen if last_data_ptr is valid
     }
 }

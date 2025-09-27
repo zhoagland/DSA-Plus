@@ -17,7 +17,7 @@ if(BUILD_DOCS)
     if(DOXYGEN_PATH_NOTFOUND)
       message(FATAL_ERROR "Doxygen is needed to build the documentation. Please install it on your system")
     else()
-  
+ 
     set(DOXYGEN_AWESOME_CSS_PATH "${doxygen-awesome-css_SOURCE_DIR}")
 
 
