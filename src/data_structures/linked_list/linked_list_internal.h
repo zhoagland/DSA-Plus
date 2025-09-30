@@ -21,6 +21,8 @@ extern "C" {
 #include "linked_list.h"
 
 
+DECLARE_HANDLE(LinkedListHandle);
+
 #ifdef __DSA_ERROR_HANDLING
     #include "../../utility/error.h"
 #endif /* __DSA_ERROR_HANDLING */

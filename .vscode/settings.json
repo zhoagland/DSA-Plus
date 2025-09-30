@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.h": "c",
+        "chrono": "c",
+        "system_error": "c",
+        "xlocale": "c"
+    }
+}

@@ -13,7 +13,7 @@
 
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 
@@ -21,7 +21,25 @@
 
 
 /* -------------------- Public Macros/Defines --------------------------- */
-#define DECLARE_HANDLE(name)    struct name##__{int unused;}; typedef struct name##__ *name
+
+/** Macro to create handle (opaque ptr type) same way used my windows */
+#define DECLARE_HANDLE(name)                                                                       \
+    struct name##__ {                                                                              \
+        int unused;                                                                                \
+    };                                                                                             \
+    typedef struct name##__ *name
+
+// This macro sets private functions as either static or global based on whether or not
+// They need to be exposed for unit testing.
+#ifdef __UNIT_TESTING__
+    #define INTERNAL_FUNC
+#else
+    #define INTERNAL_FUNC static inline
+#endif
+
+/** Macro for ABI definition */
+#define DSA_FUNC __cdecl
+
 
 /* -------------------- Public Enums ------------------------------------ */
 
@@ -35,10 +53,8 @@
 /* -------------------- Public Function Declarations -------------------- */
 
 
-
-
 #ifdef __cplusplus
-    }
+}
 #endif
 
 

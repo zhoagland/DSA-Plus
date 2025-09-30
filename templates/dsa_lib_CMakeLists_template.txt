@@ -1,10 +1,11 @@
 #FIND AND REPALCE 'DSA_LIB_TEMPLATE' WITH LIBRARY NAME
 
+
 # This file defines the DSA_LIB_TEMPLATE library
 
 # Build the main static library. Only list source files here.
 add_library(DSA_LIB_TEMPLATE STATIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/linked_list.c"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SOURCE_CODE.c"
 )
 
 # Add the required include paths for the DSA_LIB_TEMPLATE source file.
@@ -16,9 +17,10 @@ target_include_directories(DSA_LIB_TEMPLATE PRIVATE
 # This INTERFACE library holds the public header file.
 # Any target that links to `DSA_LIB_TEMPLATE` will get this include path automatically.
 add_library(DSA_LIB_TEMPLATE_public_headers INTERFACE)
+
 # We explicitly list ONLY the public header in the PUBLIC_HEADER property.
 set_target_properties(DSA_LIB_TEMPLATE_public_headers PROPERTIES
-    PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/linked_list.h"
+    PUBLIC_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/SOURCE_CODE.h"
 )
 
 # This INTERFACE library holds the headers for unit testing purposes.
@@ -32,6 +34,17 @@ target_link_libraries(DSA_LIB_TEMPLATE PUBLIC
     DSA_LIB_TEMPLATE_public_headers
     dsa_macros_header
 )
+
+if(LABWINDOWS_CVI_COMPATIBILITY)
+    target_include_directories(DSA_LIB_TEMPLATE PRIVATE
+      "C:/Program Files (x86)/National Instruments/CVI2020/include"  
+    )
+
+    target_link_libraries(DSA_LIB_TEMPLATE PRIVATE
+        "C:/Program Files (x86)/National Instruments/CVI2020/extlib/msvc/cvirt.lib"
+        "C:/Program Files (x86)/National Instruments/CVI2020/extlib/msvc/cvisupp.lib"
+    )
+endif()
 
 # Set the public header for installation. This is the correct way to
 # install headers linked via an INTERFACE library.

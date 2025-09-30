@@ -12,8 +12,7 @@
 #include "linked_list.h"
 #include "linked_list_internal.h"
 
-
-#ifndef _CVI_LIB_
+#ifndef __CVI_LIB__
     #include <stdio.h>
     #include <stdint.h>
     #include <stdlib.h>
@@ -24,7 +23,6 @@
 #endif  // !_CVI_LIB_
 
 /* -------------------- Private Macros/Defines ------------------------------------- */
-DECLARE_HANDLE(LinkedListHandle);
 
 /* -------------------- Private Macros/Defines ------------------------------------- */
 /* -------------------- Private Enums ---------------------------------------------- */
@@ -93,12 +91,12 @@ char *linked_list_get_error_message(LinkedListHandle handle) {
 
 /* Module Methods */
 
-LinkedListHandle __cdecl linked_list_initialize(dsa_list_type_t list_type, void *data) {
+int DSA_FUNC linked_list_initialize(LinkedListHandle *handle, dsa_list_type_t list_type) {
     dsa_linked_list_control_block_t *list =
         (dsa_linked_list_control_block_t *)calloc(1, sizeof(dsa_linked_list_control_block_t));
 
     if (!list) {
-        return NULL;
+        return -1;
     }
 
     list->list_type   = list_type;
@@ -106,14 +104,12 @@ LinkedListHandle __cdecl linked_list_initialize(dsa_list_type_t list_type, void 
     list->head        = NULL;
     list->tail        = NULL;
 
-    if (data) {
-        linked_list_insert_front((LinkedListHandle)list, data);
-    }
+    *handle = (LinkedListHandle)list;
 
-    return (LinkedListHandle)list;
+    return 0;
 }
 
-int __cdecl linked_list_delete(LinkedListHandle *handle) {
+int DSA_FUNC linked_list_delete(LinkedListHandle *handle) {
     VALIDATE_HANDLE(*handle, -1);
 
     dsa_node_t *next_node = NULL;
@@ -142,8 +138,8 @@ int __cdecl linked_list_delete(LinkedListHandle *handle) {
     return 0;
 }
 
-int __cdecl linked_list_mapped_action_on_delete(LinkedListHandle *handle,
-                                                void(__cdecl *mapping_fnc)(void *data)) {
+int DSA_FUNC linked_list_mapped_action_on_delete(LinkedListHandle *handle,
+                                                void(DSA_FUNC *mapping_fnc)(void *data)) {
     VALIDATE_HANDLE(*handle, -1);
 
     linked_list_map_data(*handle, mapping_fnc);
@@ -151,7 +147,7 @@ int __cdecl linked_list_mapped_action_on_delete(LinkedListHandle *handle,
     return 0;
 }
 
-int __cdecl linked_list_insert_front(LinkedListHandle handle, void *data) {
+int DSA_FUNC linked_list_insert_front(LinkedListHandle handle, void *data) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
@@ -215,7 +211,7 @@ int __cdecl linked_list_insert_front(LinkedListHandle handle, void *data) {
     return 0;
 }
 
-int __cdecl linked_list_insert_back(LinkedListHandle handle, void *data) {
+int DSA_FUNC linked_list_insert_back(LinkedListHandle handle, void *data) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list          = (dsa_linked_list_control_block_t *)handle;
@@ -250,7 +246,7 @@ int __cdecl linked_list_insert_back(LinkedListHandle handle, void *data) {
             list->tail->previous_node = previous_tail;
             break;
         case CIRCULAR_DOUBLY_LINKED_LIST:
-            // TODO 
+            // TODO
             break;
     }
 
@@ -259,7 +255,7 @@ int __cdecl linked_list_insert_back(LinkedListHandle handle, void *data) {
     return 0;
 }
 
-int __cdecl linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data) {
+int DSA_FUNC linked_list_insert_at(LinkedListHandle handle, uint32_t location, void *data) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
@@ -286,13 +282,13 @@ int __cdecl linked_list_insert_at(LinkedListHandle handle, uint32_t location, vo
     }
 
     switch (list->list_type) {
-       case CIRCULAR_SINGLY_LINKED_LIST: 
+       case CIRCULAR_SINGLY_LINKED_LIST:
        case SINGLY_LINKED_LIST:
             current_node->next_node->data      = data;
             current_node->next_node->next_node = next_node;
             break;
 
-        
+
         case CIRCULAR_DOUBLY_LINKED_LIST:
         case DOUBLY_LINKED_LIST:
             current_node->next_node->data          = data;
@@ -307,8 +303,8 @@ int __cdecl linked_list_insert_at(LinkedListHandle handle, uint32_t location, vo
     return 0;
 }
 
-int __cdecl linked_list_insert_sorted(LinkedListHandle handle, void *data,
-                                      int(__cdecl *cmpfunc)(void *a, void *b)) {
+int DSA_FUNC linked_list_insert_sorted(LinkedListHandle handle, void *data,
+                                      int(DSA_FUNC *cmpfunc)(void *a, void *b)) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list      = (dsa_linked_list_control_block_t *)handle;
@@ -344,8 +340,8 @@ int __cdecl linked_list_insert_sorted(LinkedListHandle handle, void *data,
     return 0;
 }
 
-int __cdecl linked_list_remove_front(LinkedListHandle handle,
-                                     void(__cdecl *fnc_on_removal)(void *data)) {
+int DSA_FUNC linked_list_remove_front(LinkedListHandle handle,
+                                     void(DSA_FUNC *fnc_on_removal)(void *data)) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list     = (dsa_linked_list_control_block_t *)handle;
@@ -378,8 +374,8 @@ int __cdecl linked_list_remove_front(LinkedListHandle handle,
     return 0;
 }
 
-int __cdecl linked_list_remove_back(LinkedListHandle handle,
-                                    void(__cdecl *fnc_on_removal)(void *data)) {
+int DSA_FUNC linked_list_remove_back(LinkedListHandle handle,
+                                    void(DSA_FUNC *fnc_on_removal)(void *data)) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list     = (dsa_linked_list_control_block_t *)handle;
@@ -423,13 +419,13 @@ int __cdecl linked_list_remove_back(LinkedListHandle handle,
     return 0;
 }
 
-int __cdecl linked_list_remove_node(LinkedListHandle handle, void *data,
-                                    void(__cdecl *fnc_on_removal)(void *data)) {
+int DSA_FUNC linked_list_remove_node(LinkedListHandle handle, void *data,
+                                    void(DSA_FUNC *fnc_on_removal)(void *data)) {
     return linked_list_remove_at(handle, linked_list_search(handle, data), fnc_on_removal);
 }
 
-int __cdecl linked_list_remove_at(LinkedListHandle handle, uint32_t location,
-                                  void(__cdecl *fnc_on_removal)(void *data)) {
+int DSA_FUNC linked_list_remove_at(LinkedListHandle handle, uint32_t location,
+                                  void(DSA_FUNC *fnc_on_removal)(void *data)) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list          = (dsa_linked_list_control_block_t *)handle;
@@ -463,9 +459,11 @@ int __cdecl linked_list_remove_at(LinkedListHandle handle, uint32_t location,
         next_node     = current_node->next_node;
     }
 
-    previous_node->next_node = next_node;
+    if(previous_node) {
+        previous_node->next_node = next_node;
+    }
 
-    if (list->list_type != SINGLY_LINKED_LIST) {
+    if (list->list_type != SINGLY_LINKED_LIST && next_node) {
         next_node->previous_node = previous_node;
     }
 
@@ -481,13 +479,13 @@ int __cdecl linked_list_remove_at(LinkedListHandle handle, uint32_t location,
     return 0;
 }
 
-void *__cdecl linked_list_get_back(LinkedListHandle handle) {
+void *DSA_FUNC linked_list_get_back(LinkedListHandle handle) {
     VALIDATE_HANDLE(handle, NULL);
 
     return ((dsa_linked_list_control_block_t *)handle)->tail->data;
 }
 
-void *__cdecl linked_list_get_at(LinkedListHandle handle, uint32_t location) {
+void *DSA_FUNC linked_list_get_at(LinkedListHandle handle, uint32_t location) {
     VALIDATE_HANDLE(handle, NULL);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
@@ -519,13 +517,13 @@ void *__cdecl linked_list_get_at(LinkedListHandle handle, uint32_t location) {
     return node ? node->data : NULL;
 }
 
-void *__cdecl get_front(LinkedListHandle handle) {
+void *DSA_FUNC get_front(LinkedListHandle handle) {
     VALIDATE_HANDLE(handle, NULL);
 
     return ((dsa_linked_list_control_block_t *)handle)->head->data;
 }
 
-int __cdecl linked_list_map_data(LinkedListHandle handle, void(__cdecl *mapping_fnc)(void *data)) {
+int DSA_FUNC linked_list_map_data(LinkedListHandle handle, void(DSA_FUNC *mapping_fnc)(void *data)) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_node_t *node = NULL;
@@ -540,7 +538,7 @@ int __cdecl linked_list_map_data(LinkedListHandle handle, void(__cdecl *mapping_
     return 0;
 }
 
-int32_t __cdecl linked_list_search(LinkedListHandle handle, void *data) {
+int32_t DSA_FUNC linked_list_search(LinkedListHandle handle, void *data) {
     VALIDATE_HANDLE(handle, -1);
 
     dsa_linked_list_control_block_t *list          = (dsa_linked_list_control_block_t *)handle;
@@ -556,20 +554,20 @@ int32_t __cdecl linked_list_search(LinkedListHandle handle, void *data) {
     return -1;
 }
 
-bool __cdecl linked_list_is_empty(LinkedListHandle handle) {
+bool DSA_FUNC linked_list_is_empty(LinkedListHandle handle) {
     VALIDATE_HANDLE(handle, true);
 
     return ((((dsa_linked_list_control_block_t *)handle)->list_length == 0) ? true : false);
 }
 
-int __cdecl linked_list_get_list_size(LinkedListHandle handle) {
+int DSA_FUNC linked_list_get_list_size(LinkedListHandle handle) {
     VALIDATE_HANDLE(handle, -1);
 
     return ((dsa_linked_list_control_block_t *)handle)->list_length;
 }
 
-void __cdecl linked_list_print(LinkedListHandle handle,
-                               void(__cdecl *data_printer)(FILE *, void *), FILE *output_stream) {
+void DSA_FUNC linked_list_print(LinkedListHandle handle,
+                               void(DSA_FUNC *data_printer)(FILE *, void *), FILE *output_stream) {
     VALIDATE_HANDLE(handle, );
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
@@ -601,7 +599,7 @@ void __cdecl linked_list_print(LinkedListHandle handle,
     return;
 }
 
-void *__cdecl linked_list_iter_next(LinkedListHandle handle, void *last_data_ptr) {
+void *DSA_FUNC linked_list_iter_next(LinkedListHandle handle, void *last_data_ptr) {
     VALIDATE_HANDLE(handle, NULL);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;
@@ -631,7 +629,7 @@ void *__cdecl linked_list_iter_next(LinkedListHandle handle, void *last_data_ptr
     }
 }
 
-void *__cdecl linked_list_iter_previous(LinkedListHandle handle, void *last_data_ptr) {
+void *DSA_FUNC linked_list_iter_previous(LinkedListHandle handle, void *last_data_ptr) {
     VALIDATE_HANDLE(handle, NULL);
 
     dsa_linked_list_control_block_t *list = (dsa_linked_list_control_block_t *)handle;

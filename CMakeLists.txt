@@ -16,7 +16,7 @@ project(DSA_Plus
 option(LABWINDOWS_CVI_COMPATIBILITY "Make the lib link against the cvirte not msvc rte" OFF)
 
 if(LABWINDOWS_CVI_COMPATIBILITY)
-       add_definitions(-D_CVI_LIB_=1)
+       add_definitions(-D__CVI_LIB__=1)
 endif()
 
 # Assuming your logo and icon are in an assets directory relative to your project root.
